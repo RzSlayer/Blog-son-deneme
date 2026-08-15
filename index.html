@@ -4,527 +4,770 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#09090b">
-<meta name="description" content="Kişisel blog">
-<title>Blog</title>
+<meta name="description" content="Kişisel blog ve dijital dergi">
+<title>Blog.</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root {
-    --bg: #09090b;
-    --surface: #111114;
-    --surface2: #18181c;
-    --border: #27272d;
-    --text: #f4f4f5;
-    --muted: #a1a1aa;
-    --accent: #ff6b35;
-    --accent2: #ff8a5b;
-    --danger: #ef4444;
-    --radius: 18px;
+:root{
+    --bg:#09090b;
+    --surface:#111114;
+    --surface2:#18181c;
+    --surface3:#202027;
+    --border:#29292f;
+    --text:#f4f4f5;
+    --muted:#a1a1aa;
+    --muted2:#71717a;
+    --accent:#ff6b35;
+    --accent2:#ff8a5b;
+    --danger:#ef4444;
+    --success:#22c55e;
+    --radius:20px;
+    --shadow:0 20px 60px rgba(0,0,0,.25);
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-html {
-    scroll-behavior: smooth;
+html{
+    scroll-behavior:smooth;
 }
 
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    line-height: 1.6;
+body{
+    background:
+        radial-gradient(circle at 80% 0%,rgba(255,107,53,.08),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    line-height:1.6;
+    min-height:100vh;
 }
 
-button,
-input,
-textarea,
-select {
-    font: inherit;
+button,input,textarea,select{
+    font:inherit;
 }
 
-button {
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
 
-a {
-    color: inherit;
-    text-decoration: none;
+a{
+    color:inherit;
+    text-decoration:none;
 }
 
 /* HEADER */
 
-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(18px);
-    background: rgba(9, 9, 11, .82);
-    border-bottom: 1px solid rgba(255,255,255,.06);
+header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    background:rgba(9,9,11,.78);
+    border-bottom:1px solid rgba(255,255,255,.06);
 }
 
-.nav {
-    max-width: 1180px;
-    margin: auto;
-    height: 74px;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.nav{
+    max-width:1200px;
+    height:74px;
+    margin:auto;
+    padding:0 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -1px;
+.logo{
+    font-size:25px;
+    font-weight:900;
+    letter-spacing:-1.5px;
 }
 
-.logo span {
-    color: var(--accent);
+.logo span{
+    color:var(--accent);
 }
 
-.nav-right {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.nav-right{
+    display:flex;
+    gap:10px;
+    align-items:center;
 }
 
-.nav-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 9px 15px;
-    border-radius: 12px;
+.nav-btn{
+    background:rgba(255,255,255,.02);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:9px 15px;
+    border-radius:12px;
+    transition:.2s;
 }
 
-.nav-btn:hover {
-    border-color: var(--accent);
+.nav-btn:hover{
+    border-color:var(--accent);
+    transform:translateY(-1px);
 }
 
 /* HERO */
 
-.hero {
-    max-width: 1180px;
-    margin: auto;
-    padding: 100px 24px 70px;
+.hero{
+    max-width:1200px;
+    margin:auto;
+    padding:105px 24px 80px;
 }
 
-.hero small {
-    color: var(--accent);
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+.hero small{
+    color:var(--accent);
+    font-weight:800;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
 }
 
-.hero h1 {
-    font-size: clamp(48px, 8vw, 86px);
-    line-height: .95;
-    letter-spacing: -5px;
-    max-width: 900px;
-    margin: 20px 0;
+.hero h1{
+    font-size:clamp(50px,8vw,92px);
+    line-height:.93;
+    letter-spacing:-6px;
+    max-width:950px;
+    margin:20px 0 25px;
 }
 
-.hero p {
-    color: var(--muted);
-    max-width: 650px;
-    font-size: 18px;
+.hero h1 span{
+    color:var(--accent);
 }
 
-/* CONTENT */
-
-.container {
-    max-width: 1180px;
-    margin: auto;
-    padding: 0 24px 100px;
+.hero p{
+    color:var(--muted);
+    max-width:680px;
+    font-size:18px;
 }
 
-.section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
+/* CONTAINER */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:0 24px 110px;
 }
 
-.section-title h2 {
-    font-size: 30px;
-    letter-spacing: -1px;
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    margin-bottom:25px;
 }
 
-.posts {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
+.section-title h2{
+    font-size:30px;
+    letter-spacing:-1.2px;
 }
 
-.post-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    transition: .25s ease;
+/* FEATURED */
+
+.featured{
+    display:none;
+    margin-bottom:55px;
+    position:relative;
+    min-height:390px;
+    border:1px solid var(--border);
+    border-radius:24px;
+    overflow:hidden;
+    background:var(--surface);
+    box-shadow:var(--shadow);
+    cursor:pointer;
 }
 
-.post-card:hover {
-    transform: translateY(-5px);
-    border-color: #3f3f46;
+.featured.active{
+    display:block;
 }
 
-.cover {
-    height: 210px;
+.featured-bg{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+}
+
+.featured-bg::after{
+    content:"";
+    position:absolute;
+    inset:0;
     background:
-        linear-gradient(135deg, rgba(255,107,53,.3), transparent),
-        #18181b;
-    background-size: cover;
-    background-position: center;
+        linear-gradient(90deg,rgba(9,9,11,.96),rgba(9,9,11,.55),rgba(9,9,11,.15)),
+        linear-gradient(0deg,rgba(9,9,11,.65),transparent);
 }
 
-.post-body {
-    padding: 22px;
+.featured-content{
+    position:relative;
+    z-index:2;
+    max-width:650px;
+    padding:55px;
+    min-height:390px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
 }
 
-.category {
-    color: var(--accent);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+.featured-badge{
+    display:inline-flex;
+    width:max-content;
+    background:var(--accent);
+    color:#fff;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:6px 10px;
+    border-radius:8px;
+    margin-bottom:15px;
 }
 
-.post-title {
-    font-size: 23px;
-    line-height: 1.15;
-    margin: 9px 0 10px;
-    letter-spacing: -.6px;
+.featured h2{
+    font-size:clamp(32px,5vw,58px);
+    line-height:1;
+    letter-spacing:-3px;
+    margin-bottom:14px;
 }
 
-.excerpt {
-    color: var(--muted);
-    font-size: 14px;
+.featured p{
+    color:#d4d4d8;
+    max-width:600px;
 }
 
-.meta {
-    display: flex;
-    justify-content: space-between;
-    color: #71717a;
-    font-size: 12px;
-    margin-top: 20px;
+/* SEARCH / FILTER */
+
+.tools{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:28px;
 }
 
-.empty {
-    text-align: center;
-    color: var(--muted);
-    padding: 70px 20px;
-    border: 1px dashed var(--border);
-    border-radius: var(--radius);
+.search{
+    flex:1;
+    min-width:220px;
+    position:relative;
+}
+
+.search input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:white;
+    border-radius:13px;
+    padding:12px 15px 12px 42px;
+    outline:none;
+}
+
+.search input:focus{
+    border-color:var(--accent);
+}
+
+.search-icon{
+    position:absolute;
+    left:15px;
+    top:10px;
+    color:var(--muted2);
+}
+
+.filter{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:white;
+    border-radius:13px;
+    padding:11px 14px;
+    outline:none;
+}
+
+/* POSTS */
+
+.posts{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+}
+
+.post-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    transition:.25s ease;
+    cursor:pointer;
+}
+
+.post-card:hover{
+    transform:translateY(-6px);
+    border-color:#414149;
+    box-shadow:0 18px 45px rgba(0,0,0,.22);
+}
+
+.cover{
+    height:215px;
+    background:
+        linear-gradient(135deg,rgba(255,107,53,.35),transparent),
+        linear-gradient(45deg,#18181b,#25252b);
+    background-size:cover;
+    background-position:center;
+}
+
+.post-body{
+    padding:22px;
+}
+
+.category{
+    color:var(--accent);
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+}
+
+.post-title{
+    font-size:23px;
+    line-height:1.15;
+    margin:9px 0 10px;
+    letter-spacing:-.7px;
+}
+
+.excerpt{
+    color:var(--muted);
+    font-size:14px;
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+
+.meta{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    color:var(--muted2);
+    font-size:12px;
+    margin-top:20px;
+}
+
+.tags{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:15px;
+}
+
+.tag{
+    color:#a1a1aa;
+    background:#202027;
+    border:1px solid #29292f;
+    border-radius:7px;
+    padding:3px 7px;
+    font-size:10px;
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:70px 20px;
+    border:1px dashed var(--border);
+    border-radius:var(--radius);
+    grid-column:1/-1;
 }
 
 /* ARTICLE */
 
-.article-view {
-    display: none;
-    max-width: 850px;
-    margin: auto;
-    padding: 80px 24px 120px;
+.article-view{
+    display:none;
+    max-width:900px;
+    margin:auto;
+    padding:75px 24px 120px;
 }
 
-.back {
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    padding: 10px 15px;
-    border-radius: 12px;
-    margin-bottom: 40px;
+.back{
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    padding:10px 15px;
+    border-radius:12px;
+    margin-bottom:45px;
+    transition:.2s;
 }
 
-.article-view .category {
-    display: block;
-    margin-bottom: 12px;
+.back:hover{
+    border-color:var(--accent);
 }
 
-.article-view h1 {
-    font-size: clamp(40px, 7vw, 72px);
-    line-height: 1;
-    letter-spacing: -3px;
-    margin-bottom: 20px;
+.article-view .category{
+    display:block;
+    margin-bottom:13px;
 }
 
-.article-meta {
-    color: var(--muted);
-    margin-bottom: 40px;
+.article-view h1{
+    font-size:clamp(40px,7vw,76px);
+    line-height:.98;
+    letter-spacing:-4px;
+    margin-bottom:20px;
 }
 
-.article-cover {
-    width: 100%;
-    max-height: 480px;
-    object-fit: cover;
-    border-radius: var(--radius);
-    margin-bottom: 45px;
+.article-meta{
+    color:var(--muted);
+    margin-bottom:40px;
 }
 
-.article-content {
-    font-size: 18px;
-    color: #d4d4d8;
-    white-space: pre-wrap;
-    word-break: break-word;
+.article-cover{
+    width:100%;
+    max-height:520px;
+    object-fit:cover;
+    border-radius:var(--radius);
+    margin-bottom:45px;
 }
 
-.article-content p {
-    margin-bottom: 25px;
+.article-content{
+    font-size:18px;
+    color:#d4d4d8;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.article-content p{
+    margin-bottom:25px;
 }
 
 /* ADMIN */
 
-.admin-panel {
-    display: none;
-    max-width: 1180px;
-    margin: 0 auto 70px;
-    padding: 0 24px;
+.admin-panel{
+    display:none;
+    max-width:1200px;
+    margin:0 auto 65px;
+    padding:0 24px;
 }
 
-.admin-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 25px;
+.admin-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:25px;
 }
 
-.admin-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
+.admin-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
 }
 
-.admin-top h3 {
-    font-size: 20px;
+.admin-top h3{
+    font-size:20px;
 }
 
-.admin-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+.admin-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:22px;
 }
 
-.primary {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 10px 17px;
-    border-radius: 11px;
-    font-weight: 700;
+.stat{
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:17px;
 }
 
-.primary:hover {
-    background: var(--accent2);
+.stat strong{
+    display:block;
+    font-size:27px;
 }
 
-.secondary {
-    background: var(--surface2);
-    color: white;
-    border: 1px solid var(--border);
-    padding: 10px 17px;
-    border-radius: 11px;
+.stat span{
+    color:var(--muted);
+    font-size:12px;
 }
 
-.danger {
-    background: transparent;
-    color: #f87171;
-    border: 1px solid #4b2020;
-    padding: 8px 12px;
-    border-radius: 9px;
+.admin-actions{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
 }
 
-.admin-list {
-    margin-top: 25px;
-    display: grid;
-    gap: 10px;
+.primary{
+    background:var(--accent);
+    color:white;
+    border:none;
+    padding:10px 17px;
+    border-radius:11px;
+    font-weight:800;
 }
 
-.admin-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    padding: 14px;
-    background: var(--surface2);
-    border-radius: 12px;
+.primary:hover{
+    background:var(--accent2);
 }
 
-.admin-item-info {
-    min-width: 0;
+.secondary{
+    background:var(--surface2);
+    color:white;
+    border:1px solid var(--border);
+    padding:9px 14px;
+    border-radius:10px;
 }
 
-.admin-item-title {
-    font-weight: 700;
+.danger{
+    background:transparent;
+    color:#f87171;
+    border:1px solid #4b2020;
+    padding:8px 12px;
+    border-radius:9px;
 }
 
-.admin-item-status {
-    font-size: 12px;
-    color: var(--muted);
+.admin-list{
+    margin-top:25px;
+    display:grid;
+    gap:10px;
+}
+
+.admin-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    padding:15px;
+    background:var(--surface2);
+    border-radius:12px;
+}
+
+.admin-item-info{
+    min-width:0;
+}
+
+.admin-item-title{
+    font-weight:750;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.admin-item-status{
+    font-size:12px;
+    color:var(--muted);
 }
 
 /* MODAL */
 
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(0,0,0,.78);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    overflow-y: auto;
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    padding:20px;
+    overflow-y:auto;
 }
 
-.modal-box {
-    max-width: 720px;
-    margin: 50px auto;
-    background: #101014;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 25px;
+.modal-box{
+    max-width:720px;
+    margin:45px auto;
+    background:#101014;
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:25px;
+    box-shadow:var(--shadow);
 }
 
-.modal-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
 }
 
-.close {
-    background: transparent;
-    color: white;
-    border: none;
-    font-size: 28px;
+.close{
+    background:transparent;
+    color:white;
+    border:none;
+    font-size:28px;
 }
 
-.form-group {
-    margin-bottom: 17px;
+.form-group{
+    margin-bottom:17px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 7px;
-    color: #d4d4d8;
-    font-size: 14px;
-    font-weight: 600;
+.form-group label{
+    display:block;
+    margin-bottom:7px;
+    color:#d4d4d8;
+    font-size:14px;
+    font-weight:650;
 }
 
 .form-group input,
 .form-group textarea,
-.form-group select {
-    width: 100%;
-    background: var(--surface2);
-    color: white;
-    border: 1px solid var(--border);
-    outline: none;
-    border-radius: 11px;
-    padding: 12px 13px;
+.form-group select{
+    width:100%;
+    background:var(--surface2);
+    color:white;
+    border:1px solid var(--border);
+    outline:none;
+    border-radius:11px;
+    padding:12px 13px;
 }
 
-.form-group textarea {
-    min-height: 240px;
-    resize: vertical;
+.form-group textarea{
+    min-height:280px;
+    resize:vertical;
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
-.form-group select:focus {
-    border-color: var(--accent);
+.form-group select:focus{
+    border-color:var(--accent);
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
 }
 
-.checkbox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--muted);
-    margin: 10px 0 20px;
+.checkbox{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--muted);
+    margin:10px 0 20px;
 }
 
-.checkbox input {
-    width: auto;
+.checkbox input{
+    width:auto;
 }
 
-/* LOGIN */
-
-.login-box {
-    max-width: 430px;
+.login-box{
+    max-width:430px;
 }
 
-.login-message {
-    color: #f87171;
-    margin-bottom: 15px;
-    font-size: 14px;
+.login-message{
+    color:#f87171;
+    margin-bottom:15px;
+    font-size:14px;
 }
 
-footer {
-    border-top: 1px solid var(--border);
-    padding: 35px 24px;
-    color: #71717a;
-    text-align: center;
+.toast{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    z-index:3000;
+    background:#18181c;
+    border:1px solid var(--border);
+    color:white;
+    padding:14px 18px;
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    transform:translateY(120px);
+    opacity:0;
+    transition:.3s;
+}
+
+.toast.show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+footer{
+    border-top:1px solid var(--border);
+    padding:35px 24px;
+    color:var(--muted2);
+    text-align:center;
 }
 
 /* MOBILE */
 
-@media (max-width: 850px) {
-    .posts {
-        grid-template-columns: repeat(2, 1fr);
+@media(max-width:850px){
+    .posts{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .featured-content{
+        padding:35px;
     }
 }
 
-@media (max-width: 600px) {
-    .nav {
-        height: 65px;
-        padding: 0 16px;
+@media(max-width:600px){
+    .nav{
+        height:65px;
+        padding:0 16px;
     }
 
-    .logo {
-        font-size: 20px;
+    .logo{
+        font-size:21px;
     }
 
-    .hero {
-        padding: 70px 20px 55px;
+    .hero{
+        padding:75px 20px 60px;
     }
 
-    .hero h1 {
-        letter-spacing: -3px;
+    .hero h1{
+        letter-spacing:-3.5px;
     }
 
-    .container {
-        padding: 0 20px 70px;
+    .container{
+        padding:0 20px 75px;
     }
 
-    .posts {
-        grid-template-columns: 1fr;
+    .posts{
+        grid-template-columns:1fr;
     }
 
-    .cover {
-        height: 220px;
+    .cover{
+        height:220px;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
+    .featured{
+        min-height:350px;
     }
 
-    .admin-top {
-        align-items: flex-start;
-        flex-direction: column;
+    .featured-content{
+        min-height:350px;
+        padding:28px;
     }
 
-    .admin-item {
-        align-items: flex-start;
-        flex-direction: column;
+    .featured h2{
+        letter-spacing:-2px;
+    }
+
+    .form-row{
+        grid-template-columns:1fr;
+    }
+
+    .admin-top{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .admin-item{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .admin-stats{
+        grid-template-columns:1fr;
+    }
+
+    .article-view{
+        padding:55px 20px 90px;
+    }
+
+    .article-view h1{
+        letter-spacing:-2.5px;
+    }
+
+    .toast{
+        left:20px;
+        right:20px;
+        bottom:20px;
     }
 }
 </style>
@@ -533,69 +776,176 @@ footer {
 <body>
 
 <header>
-    <nav class="nav">
-        <a href="#" class="logo">BLOG<span>.</span></a>
+<nav class="nav">
 
-        <div class="nav-right">
-            <button class="nav-btn" id="loginButton" onclick="openLogin()">
-                Admin
-            </button>
+    <a href="#" class="logo" onclick="showHome();return false;">
+        BLOG<span>.</span>
+    </a>
 
-            <button class="nav-btn" id="logoutButton" onclick="logout()" style="display:none">
-                Çıkış
-            </button>
-        </div>
-    </nav>
+    <div class="nav-right">
+
+        <button class="nav-btn" id="loginButton" onclick="openLogin()">
+            Admin
+        </button>
+
+        <button class="nav-btn" id="logoutButton"
+                onclick="logout()" style="display:none">
+            Çıkış
+        </button>
+
+    </div>
+
+</nav>
 </header>
 
+
+<!-- HERO -->
+
 <section class="hero" id="home">
+
     <small>Personal Blog</small>
 
-    <h1>Düşünceler.<br>Hikâyeler.<br>Benim dünyam.</h1>
+    <h1>
+        Düşünceler.<br>
+        Hikâyeler.<br>
+        <span>Benim dünyam.</span>
+    </h1>
 
     <p>
         Yazılar, hikâyeler, fikirler ve aklıma takılan her şey.
         Burada kendi dünyamı kelimelerle kuruyorum.
     </p>
+
 </section>
 
+
+<!-- ADMIN -->
+
 <section class="admin-panel" id="adminPanel">
+
     <div class="admin-box">
+
         <div class="admin-top">
+
             <div>
                 <h3>Yönetim Paneli</h3>
+
                 <span style="color:#71717a;font-size:13px">
-                    Blog yazılarını buradan yönetebilirsin.
+                    Blogunu buradan yönetebilirsin.
                 </span>
             </div>
 
             <div class="admin-actions">
+
                 <button class="primary" onclick="openEditor()">
                     + Yeni Yazı
                 </button>
+
             </div>
+
+        </div>
+
+        <div class="admin-stats">
+
+            <div class="stat">
+                <strong id="totalPosts">0</strong>
+                <span>Toplam yazı</span>
+            </div>
+
+            <div class="stat">
+                <strong id="publishedPosts">0</strong>
+                <span>Yayınlanan</span>
+            </div>
+
+            <div class="stat">
+                <strong id="draftPosts">0</strong>
+                <span>Taslak</span>
+            </div>
+
         </div>
 
         <div class="admin-list" id="adminList"></div>
+
     </div>
+
 </section>
+
+
+<!-- MAIN -->
 
 <main class="container" id="mainContent">
 
+    <section class="featured" id="featured"
+             onclick="openFeatured()">
+
+        <div class="featured-bg" id="featuredBg"></div>
+
+        <div class="featured-content">
+
+            <span class="featured-badge">
+                Öne Çıkan
+            </span>
+
+            <h2 id="featuredTitle"></h2>
+
+            <p id="featuredExcerpt"></p>
+
+        </div>
+
+    </section>
+
+
     <div class="section-title">
+
         <h2>Son Yazılar</h2>
+
     </div>
 
+
+    <div class="tools">
+
+        <div class="search">
+
+            <span class="search-icon">⌕</span>
+
+            <input
+                id="searchInput"
+                type="search"
+                placeholder="Yazılarda ara..."
+                oninput="filterPosts()">
+
+        </div>
+
+        <select
+            id="categoryFilter"
+            class="filter"
+            onchange="filterPosts()">
+
+            <option value="">Tüm kategoriler</option>
+
+        </select>
+
+    </div>
+
+
     <div class="posts" id="posts">
+
         <div class="empty">
             Yazılar yükleniyor...
         </div>
+
     </div>
 
 </main>
 
+
+<!-- ARTICLE -->
+
 <section class="article-view" id="articleView">
-    <button class="back" onclick="showHome()">← Yazılara dön</button>
+
+    <button class="back" onclick="showHome()">
+        ← Yazılara dön
+    </button>
 
     <span class="category" id="articleCategory"></span>
 
@@ -603,135 +953,246 @@ footer {
 
     <div class="article-meta" id="articleMeta"></div>
 
-    <img id="articleCover" class="article-cover" style="display:none">
+    <img
+        id="articleCover"
+        class="article-cover"
+        style="display:none">
 
-    <div class="article-content" id="articleContent"></div>
+    <div
+        class="article-content"
+        id="articleContent">
+    </div>
+
 </section>
+
 
 <footer>
     © <span id="year"></span> Blog. Tüm hakları saklıdır.
 </footer>
 
-<!-- LOGIN MODAL -->
+
+<!-- LOGIN -->
 
 <div class="modal" id="loginModal">
+
     <div class="modal-box login-box">
 
         <div class="modal-head">
+
             <h2>Admin Girişi</h2>
-            <button class="close" onclick="closeModal('loginModal')">×</button>
+
+            <button class="close"
+                    onclick="closeModal('loginModal')">
+                ×
+            </button>
+
         </div>
 
-        <div class="login-message" id="loginMessage"></div>
+        <div class="login-message"
+             id="loginMessage"></div>
 
         <div class="form-group">
+
             <label>E-posta</label>
-            <input type="email" id="loginEmail" placeholder="admin@email.com">
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="admin@email.com">
+
         </div>
 
         <div class="form-group">
+
             <label>Şifre</label>
-            <input type="password" id="loginPassword" placeholder="••••••••">
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="••••••••">
+
         </div>
 
-        <button class="primary" style="width:100%" onclick="login()">
+        <button
+            class="primary"
+            style="width:100%"
+            onclick="login()">
+
             Giriş Yap
+
         </button>
 
     </div>
+
 </div>
 
-<!-- EDITOR MODAL -->
+
+<!-- EDITOR -->
 
 <div class="modal" id="editorModal">
+
     <div class="modal-box">
 
         <div class="modal-head">
-            <h2 id="editorTitle">Yeni Yazı</h2>
-            <button class="close" onclick="closeModal('editorModal')">×</button>
+
+            <h2 id="editorTitle">
+                Yeni Yazı
+            </h2>
+
+            <button class="close"
+                    onclick="closeModal('editorModal')">
+                ×
+            </button>
+
         </div>
 
         <input type="hidden" id="postId">
 
         <div class="form-group">
+
             <label>Başlık</label>
-            <input id="postTitle" placeholder="Yazının başlığı">
+
+            <input
+                id="postTitle"
+                placeholder="Yazının başlığı">
+
         </div>
+
 
         <div class="form-row">
 
             <div class="form-group">
+
                 <label>Kategori</label>
-                <input id="postCategory" placeholder="Örneğin: Hikâye">
+
+                <input
+                    id="postCategory"
+                    placeholder="Örneğin: Hikâye">
+
             </div>
+
 
             <div class="form-group">
+
                 <label>Okuma süresi</label>
-                <input id="postReadTime" type="number" value="5" min="1">
+
+                <input
+                    id="postReadTime"
+                    type="number"
+                    value="5"
+                    min="1">
+
             </div>
 
         </div>
 
+
         <div class="form-group">
+
             <label>Kapak görseli URL</label>
-            <input id="postCover" placeholder="https://...">
+
+            <input
+                id="postCover"
+                placeholder="https://...">
+
         </div>
 
+
         <div class="form-group">
+
             <label>Etiketler</label>
-            <input id="postTags" placeholder="yazı, hikâye, düşünce">
+
+            <input
+                id="postTags"
+                placeholder="yazı, hikâye, düşünce">
+
         </div>
 
+
         <div class="form-group">
+
             <label>Yazı</label>
-            <textarea id="postContent" placeholder="Yazını buraya yaz..."></textarea>
+
+            <textarea
+                id="postContent"
+                placeholder="Yazını buraya yaz...">
+            </textarea>
+
         </div>
+
 
         <label class="checkbox">
-            <input type="checkbox" id="postPublished">
+
+            <input
+                type="checkbox"
+                id="postPublished">
+
             Yazıyı yayınla
+
         </label>
 
-        <button class="primary" style="width:100%" onclick="savePost()">
+
+        <button
+            class="primary"
+            style="width:100%"
+            onclick="savePost()">
+
             Yazıyı Kaydet
+
         </button>
 
     </div>
+
 </div>
 
-<script>
-/* ================================
-   SUPABASE
-================================ */
 
-const SUPABASE_URL = "https://eajwiqqseoircejpphgs.supabase.co";
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+"https://eajwiqqseoircejpphgs.supabase.co";
 
 const SUPABASE_KEY =
 "sb_publishable_5sLyWbYySGLwEk7sWKhhUg_XGSBzVrU";
 
 const supabaseClient =
-    supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 
-/* ================================
-   GENEL
-================================ */
-
-document.getElementById("year").textContent =
-    new Date().getFullYear();
+/* =========================================================
+   GLOBAL
+========================================================= */
 
 let currentSession = null;
+let allPosts = [];
+let featuredPost = null;
 
 
-/* ================================
-   SAYFA BAŞLANGICI
-================================ */
+/* =========================================================
+   START
+========================================================= */
 
-async function init() {
+document.getElementById("year").textContent =
+new Date().getFullYear();
+
+init();
+
+
+async function init(){
 
     const {
-        data: { session }
-    } = await supabaseClient.auth.getSession();
+        data:{session}
+    } =
+    await supabaseClient.auth.getSession();
 
     currentSession = session;
 
@@ -739,558 +1200,969 @@ async function init() {
 
     await loadPosts();
 
-    if (session) {
+    if(session){
         await loadAdminPosts();
     }
 }
 
-init();
 
-
-/* ================================
+/* =========================================================
    AUTH
-================================ */
+========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
-    async (_event, session) => {
+async(_event,session)=>{
 
-        currentSession = session;
+    currentSession = session;
 
-        updateAdminUI();
+    updateAdminUI();
 
-        if (session) {
-            await loadAdminPosts();
-        }
+    if(session){
+
+        await loadAdminPosts();
+
+    }else{
+
+        document.getElementById(
+            "adminPanel"
+        ).style.display = "none";
+
     }
-);
+
+});
 
 
-function updateAdminUI() {
+function updateAdminUI(){
 
-    const panel = document.getElementById("adminPanel");
-    const login = document.getElementById("loginButton");
-    const logoutButton = document.getElementById("logoutButton");
+    const panel =
+    document.getElementById("adminPanel");
 
-    if (currentSession) {
+    const login =
+    document.getElementById("loginButton");
+
+    const logoutButton =
+    document.getElementById("logoutButton");
+
+    if(currentSession){
 
         panel.style.display = "block";
         login.style.display = "none";
         logoutButton.style.display = "block";
 
-    } else {
+    }else{
 
         panel.style.display = "none";
         login.style.display = "block";
         logoutButton.style.display = "none";
+
     }
 }
 
 
-function openLogin() {
+function openLogin(){
 
-    document.getElementById("loginMessage").textContent = "";
+    document.getElementById(
+        "loginMessage"
+    ).textContent = "";
 
-    document.getElementById("loginModal").style.display = "block";
+    document.getElementById(
+        "loginEmail"
+    ).value = "";
+
+    document.getElementById(
+        "loginPassword"
+    ).value = "";
+
+    document.getElementById(
+        "loginModal"
+    ).style.display = "block";
+
 }
 
 
-async function login() {
+async function login(){
 
     const email =
-        document.getElementById("loginEmail").value.trim();
+    document.getElementById(
+        "loginEmail"
+    ).value.trim();
 
     const password =
-        document.getElementById("loginPassword").value;
+    document.getElementById(
+        "loginPassword"
+    ).value;
 
     const message =
-        document.getElementById("loginMessage");
+    document.getElementById(
+        "loginMessage"
+    );
 
     message.textContent = "";
 
-    if (!email || !password) {
+    if(!email || !password){
+
         message.textContent =
-            "E-posta ve şifre gerekli.";
+        "E-posta ve şifre gerekli.";
+
         return;
     }
 
-    const { error } =
-        await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+    const {error} =
+    await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
 
-    if (error) {
+    if(error){
 
         message.textContent =
-            error.message;
+        "Giriş başarısız: " +
+        error.message;
 
         return;
     }
 
     closeModal("loginModal");
+
+    showToast("Admin girişi başarılı. 👋");
+
 }
 
 
-async function logout() {
+async function logout(){
 
     await supabaseClient.auth.signOut();
 
+    currentSession = null;
+
+    updateAdminUI();
+
     showHome();
 
-    location.reload();
+    showToast("Çıkış yapıldı.");
+
 }
 
 
-/* ================================
-   YAZILARI GETİR
-================================ */
+/* =========================================================
+   POSTS
+========================================================= */
 
-async function loadPosts() {
+async function loadPosts(){
 
     const postsContainer =
-        document.getElementById("posts");
+    document.getElementById("posts");
 
-    const { data, error } =
-        await supabaseClient
-            .from("posts")
-            .select("*")
-            .eq("published", true)
-            .order("created_at", {
-                ascending: false
-            });
+    postsContainer.innerHTML =
+    `<div class="empty">Yazılar yükleniyor...</div>`;
 
-    if (error) {
+    const {data,error} =
+    await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("published",true)
+        .order("created_at",{ascending:false});
 
-        postsContainer.innerHTML = `
-            <div class="empty">
-                Yazılar yüklenirken bir hata oluştu.
-            </div>
-        `;
+    if(error){
 
         console.error(error);
+
+        postsContainer.innerHTML =
+        `<div class="empty">
+            Yazılar yüklenirken bir hata oluştu.
+        </div>`;
 
         return;
     }
 
-    if (!data || data.length === 0) {
+    allPosts = data || [];
 
-        postsContainer.innerHTML = `
-            <div class="empty">
-                Henüz yayınlanmış bir yazı yok.
-            </div>
-        `;
+    buildCategories();
+
+    chooseFeatured();
+
+    renderPosts(allPosts);
+
+}
+
+
+function renderPosts(posts){
+
+    const postsContainer =
+    document.getElementById("posts");
+
+    if(!posts || posts.length === 0){
+
+        postsContainer.innerHTML =
+        `<div class="empty">
+            Aramana uygun yayınlanmış yazı bulunamadı.
+        </div>`;
 
         return;
     }
 
     postsContainer.innerHTML =
-        data.map(post => createPostCard(post)).join("");
+    posts.map(createPostCard).join("");
+
 }
 
 
-/* ================================
-   POST CARD
-================================ */
+function createPostCard(post){
 
-function createPostCard(post) {
-
-    const cover = post.cover_url
-        ? `style="background-image:url('${escapeAttribute(post.cover_url)}')"`
-        : "";
+    const cover =
+    post.cover_url
+    ? `style="background-image:url('${escapeAttribute(post.cover_url)}')"`
+    : "";
 
     const excerpt =
-        post.excerpt ||
-        post.content.substring(0, 140) + "...";
+    post.excerpt ||
+    String(post.content || "")
+        .substring(0,150) + "...";
+
+    const tags =
+    Array.isArray(post.tags)
+    ? post.tags.slice(0,4).map(tag=>`
+        <span class="tag">
+            #${escapeHTML(tag)}
+        </span>
+    `).join("")
+    : "";
 
     return `
-        <article class="post-card"
-            onclick="openPost('${post.id}')">
 
-            <div class="cover" ${cover}></div>
+    <article
+        class="post-card"
+        onclick="openPost('${post.id}')">
 
-            <div class="post-body">
+        <div class="cover" ${cover}></div>
 
-                <div class="category">
-                    ${escapeHTML(post.category || "Genel")}
-                </div>
+        <div class="post-body">
 
-                <h3 class="post-title">
-                    ${escapeHTML(post.title)}
-                </h3>
+            <div class="category">
+                ${escapeHTML(
+                    post.category || "Genel"
+                )}
+            </div>
 
-                <p class="excerpt">
-                    ${escapeHTML(excerpt)}
-                </p>
+            <h3 class="post-title">
+                ${escapeHTML(post.title)}
+            </h3>
 
-                <div class="meta">
-                    <span>
-                        ${formatDate(post.created_at)}
-                    </span>
+            <p class="excerpt">
+                ${escapeHTML(excerpt)}
+            </p>
 
-                    <span>
-                        ${post.read_time || 5} dk okuma
-                    </span>
-                </div>
+            ${tags ? `
+            <div class="tags">
+                ${tags}
+            </div>
+            ` : ""}
+
+            <div class="meta">
+
+                <span>
+                    ${formatDate(post.created_at)}
+                </span>
+
+                <span>
+                    ${post.read_time || 5} dk okuma
+                </span>
 
             </div>
 
-        </article>
+        </div>
+
+    </article>
+
     `;
+
 }
 
 
-/* ================================
-   TEK YAZI
-================================ */
+/* =========================================================
+   FEATURED
+========================================================= */
 
-async function openPost(id) {
+function chooseFeatured(){
 
-    const { data, error } =
-        await supabaseClient
-            .from("posts")
-            .select("*")
-            .eq("id", id)
-            .single();
+    const featured =
+    document.getElementById("featured");
 
-    if (error || !data) return;
+    if(!allPosts.length){
 
-    document.getElementById("mainContent").style.display = "none";
-    document.getElementById("home").style.display = "none";
-    document.getElementById("adminPanel").style.display = "none";
+        featured.classList.remove("active");
 
-    const article =
-        document.getElementById("articleView");
-
-    article.style.display = "block";
-
-    document.getElementById("articleCategory").textContent =
-        data.category || "Genel";
-
-    document.getElementById("articleTitle").textContent =
-        data.title;
-
-    document.getElementById("articleMeta").textContent =
-        `${formatDate(data.created_at)} • ${data.read_time || 5} dk okuma`;
-
-    document.getElementById("articleContent").textContent =
-        data.content;
-
-    const cover =
-        document.getElementById("articleCover");
-
-    if (data.cover_url) {
-
-        cover.src = data.cover_url;
-        cover.style.display = "block";
-
-    } else {
-
-        cover.style.display = "none";
-    }
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-
-function showHome() {
-
-    document.getElementById("articleView").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
-    document.getElementById("home").style.display = "block";
-
-    updateAdminUI();
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-
-/* ================================
-   ADMIN YAZILARI
-================================ */
-
-async function loadAdminPosts() {
-
-    if (!currentSession) return;
-
-    const list =
-        document.getElementById("adminList");
-
-    const { data, error } =
-        await supabaseClient
-            .from("posts")
-            .select("*")
-            .order("created_at", {
-                ascending: false
-            });
-
-    if (error) {
-
-        list.innerHTML =
-            `<div style="color:#f87171">
-                ${escapeHTML(error.message)}
-            </div>`;
+        featuredPost = null;
 
         return;
     }
 
-    if (!data.length) {
+    featuredPost = allPosts[0];
+
+    document.getElementById(
+        "featuredTitle"
+    ).textContent =
+    featuredPost.title;
+
+    document.getElementById(
+        "featuredExcerpt"
+    ).textContent =
+    featuredPost.excerpt ||
+    String(featuredPost.content || "")
+        .substring(0,200);
+
+    const bg =
+    document.getElementById("featuredBg");
+
+    if(featuredPost.cover_url){
+
+        bg.style.backgroundImage =
+        `url("${escapeAttribute(
+            featuredPost.cover_url
+        )}")`;
+
+    }else{
+
+        bg.style.backgroundImage =
+        "linear-gradient(135deg,#3b1710,#18181b)";
+
+    }
+
+    featured.classList.add("active");
+
+}
+
+
+function openFeatured(){
+
+    if(featuredPost){
+
+        openPost(featuredPost.id);
+
+    }
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function filterPosts(){
+
+    const search =
+    document.getElementById(
+        "searchInput"
+    ).value
+        .trim()
+        .toLowerCase();
+
+    const category =
+    document.getElementById(
+        "categoryFilter"
+    ).value;
+
+    const filtered =
+    allPosts.filter(post=>{
+
+        const text =
+        [
+            post.title,
+            post.content,
+            post.excerpt,
+            post.category,
+            ...(Array.isArray(post.tags)
+                ? post.tags
+                : [])
+        ]
+        .join(" ")
+        .toLowerCase();
+
+        const matchesSearch =
+        !search || text.includes(search);
+
+        const matchesCategory =
+        !category ||
+        post.category === category;
+
+        return matchesSearch &&
+               matchesCategory;
+
+    });
+
+    renderPosts(filtered);
+
+}
+
+
+function buildCategories(){
+
+    const select =
+    document.getElementById(
+        "categoryFilter"
+    );
+
+    const categories =
+    [...new Set(
+        allPosts
+            .map(post=>post.category)
+            .filter(Boolean)
+    )].sort();
+
+    select.innerHTML =
+    `<option value="">
+        Tüm kategoriler
+    </option>`;
+
+    categories.forEach(category=>{
+
+        const option =
+        document.createElement("option");
+
+        option.value = category;
+        option.textContent = category;
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+/* =========================================================
+   SINGLE ARTICLE
+========================================================= */
+
+async function openPost(id){
+
+    const {data,error} =
+    await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("id",id)
+        .single();
+
+    if(error || !data){
+
+        showToast(
+            "Yazı bulunamadı."
+        );
+
+        return;
+    }
+
+    document.getElementById(
+        "mainContent"
+    ).style.display = "none";
+
+    document.getElementById(
+        "home"
+    ).style.display = "none";
+
+    document.getElementById(
+        "adminPanel"
+    ).style.display = "none";
+
+    const article =
+    document.getElementById(
+        "articleView"
+    );
+
+    article.style.display = "block";
+
+    document.getElementById(
+        "articleCategory"
+    ).textContent =
+    data.category || "Genel";
+
+    document.getElementById(
+        "articleTitle"
+    ).textContent =
+    data.title;
+
+    document.getElementById(
+        "articleMeta"
+    ).textContent =
+    `${formatDate(data.created_at)} • ${data.read_time || 5} dk okuma`;
+
+    document.getElementById(
+        "articleContent"
+    ).textContent =
+    data.content;
+
+    const cover =
+    document.getElementById(
+        "articleCover"
+    );
+
+    if(data.cover_url){
+
+        cover.src = data.cover_url;
+        cover.style.display = "block";
+
+    }else{
+
+        cover.style.display = "none";
+
+    }
+
+    history.pushState(
+        {},
+        "",
+        "#post-" + id
+    );
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+function showHome(){
+
+    document.getElementById(
+        "articleView"
+    ).style.display = "none";
+
+    document.getElementById(
+        "mainContent"
+    ).style.display = "block";
+
+    document.getElementById(
+        "home"
+    ).style.display = "block";
+
+    updateAdminUI();
+
+    history.pushState(
+        {},
+        "",
+        window.location.pathname
+    );
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+/* =========================================================
+   ADMIN POSTS
+========================================================= */
+
+async function loadAdminPosts(){
+
+    if(!currentSession) return;
+
+    const list =
+    document.getElementById(
+        "adminList"
+    );
+
+    const {data,error} =
+    await supabaseClient
+        .from("posts")
+        .select("*")
+        .order("created_at",{ascending:false});
+
+    if(error){
 
         list.innerHTML =
-            `<div style="color:#71717a">
-                Henüz yazı oluşturmadın.
-            </div>`;
+        `<div style="color:#f87171">
+            ${escapeHTML(error.message)}
+        </div>`;
+
+        return;
+    }
+
+    const posts = data || [];
+
+    document.getElementById(
+        "totalPosts"
+    ).textContent =
+    posts.length;
+
+    document.getElementById(
+        "publishedPosts"
+    ).textContent =
+    posts.filter(p=>p.published).length;
+
+    document.getElementById(
+        "draftPosts"
+    ).textContent =
+    posts.filter(p=>!p.published).length;
+
+    if(!posts.length){
+
+        list.innerHTML =
+        `<div style="color:#71717a">
+            Henüz yazı oluşturmadın.
+        </div>`;
 
         return;
     }
 
     list.innerHTML =
-        data.map(post => `
+    posts.map(post=>`
 
-            <div class="admin-item">
+        <div class="admin-item">
 
-                <div class="admin-item-info">
+            <div class="admin-item-info">
 
-                    <div class="admin-item-title">
-                        ${escapeHTML(post.title)}
-                    </div>
-
-                    <div class="admin-item-status">
-                        ${post.published
-                            ? "🟢 Yayında"
-                            : "⚪ Taslak"}
-                        •
-                        ${formatDate(post.created_at)}
-                    </div>
-
+                <div class="admin-item-title">
+                    ${escapeHTML(post.title)}
                 </div>
 
-                <div class="admin-actions">
+                <div class="admin-item-status">
 
-                    <button
-                        class="secondary"
-                        onclick="editPost('${post.id}')">
-                        Düzenle
-                    </button>
+                    ${post.published
+                        ? "🟢 Yayında"
+                        : "⚪ Taslak"}
 
-                    <button
-                        class="danger"
-                        onclick="deletePost('${post.id}')">
-                        Sil
-                    </button>
+                    •
+                    ${formatDate(post.created_at)}
 
                 </div>
 
             </div>
 
-        `).join("");
+            <div class="admin-actions">
+
+                <button
+                    class="secondary"
+                    onclick="editPost('${post.id}')">
+
+                    Düzenle
+
+                </button>
+
+                <button
+                    class="danger"
+                    onclick="deletePost('${post.id}')">
+
+                    Sil
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
 }
 
 
-/* ================================
-   YENİ YAZI
-================================ */
+/* =========================================================
+   NEW POST
+========================================================= */
 
-function openEditor() {
+function openEditor(){
 
-    document.getElementById("editorTitle").textContent =
-        "Yeni Yazı";
+    document.getElementById(
+        "editorTitle"
+    ).textContent =
+    "Yeni Yazı";
 
-    document.getElementById("postId").value = "";
+    document.getElementById(
+        "postId"
+    ).value = "";
 
-    document.getElementById("postTitle").value = "";
-    document.getElementById("postCategory").value = "";
-    document.getElementById("postReadTime").value = "5";
-    document.getElementById("postCover").value = "";
-    document.getElementById("postTags").value = "";
-    document.getElementById("postContent").value = "";
-    document.getElementById("postPublished").checked = true;
+    document.getElementById(
+        "postTitle"
+    ).value = "";
 
-    document.getElementById("editorModal").style.display =
-        "block";
+    document.getElementById(
+        "postCategory"
+    ).value = "";
+
+    document.getElementById(
+        "postReadTime"
+    ).value = "5";
+
+    document.getElementById(
+        "postCover"
+    ).value = "";
+
+    document.getElementById(
+        "postTags"
+    ).value = "";
+
+    document.getElementById(
+        "postContent"
+    ).value = "";
+
+    document.getElementById(
+        "postPublished"
+    ).checked = true;
+
+    document.getElementById(
+        "editorModal"
+    ).style.display = "block";
+
 }
 
 
-/* ================================
-   DÜZENLE
-================================ */
+/* =========================================================
+   EDIT
+========================================================= */
 
-async function editPost(id) {
+async function editPost(id){
 
-    const { data, error } =
-        await supabaseClient
-            .from("posts")
-            .select("*")
-            .eq("id", id)
-            .single();
+    const {data,error} =
+    await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("id",id)
+        .single();
 
-    if (error || !data) {
+    if(error || !data){
 
-        alert("Yazı bulunamadı.");
+        showToast(
+            "Yazı bulunamadı."
+        );
+
         return;
     }
 
-    document.getElementById("editorTitle").textContent =
-        "Yazıyı Düzenle";
+    document.getElementById(
+        "editorTitle"
+    ).textContent =
+    "Yazıyı Düzenle";
 
-    document.getElementById("postId").value =
-        data.id;
+    document.getElementById(
+        "postId"
+    ).value =
+    data.id;
 
-    document.getElementById("postTitle").value =
-        data.title || "";
+    document.getElementById(
+        "postTitle"
+    ).value =
+    data.title || "";
 
-    document.getElementById("postCategory").value =
-        data.category || "";
+    document.getElementById(
+        "postCategory"
+    ).value =
+    data.category || "";
 
-    document.getElementById("postReadTime").value =
-        data.read_time || 5;
+    document.getElementById(
+        "postReadTime"
+    ).value =
+    data.read_time || 5;
 
-    document.getElementById("postCover").value =
-        data.cover_url || "";
+    document.getElementById(
+        "postCover"
+    ).value =
+    data.cover_url || "";
 
-    document.getElementById("postTags").value =
-        Array.isArray(data.tags)
-            ? data.tags.join(", ")
-            : "";
+    document.getElementById(
+        "postTags"
+    ).value =
+    Array.isArray(data.tags)
+    ? data.tags.join(", ")
+    : "";
 
-    document.getElementById("postContent").value =
-        data.content || "";
+    document.getElementById(
+        "postContent"
+    ).value =
+    data.content || "";
 
-    document.getElementById("postPublished").checked =
-        !!data.published;
+    document.getElementById(
+        "postPublished"
+    ).checked =
+    !!data.published;
 
-    document.getElementById("editorModal").style.display =
-        "block";
+    document.getElementById(
+        "editorModal"
+    ).style.display = "block";
+
 }
 
 
-/* ================================
-   KAYDET
-================================ */
+/* =========================================================
+   SAVE
+========================================================= */
 
-async function savePost() {
+async function savePost(){
 
-    if (!currentSession) {
+    if(!currentSession){
 
-        alert("Önce admin olarak giriş yapmalısın.");
+        showToast(
+            "Önce admin olarak giriş yapmalısın."
+        );
+
         return;
     }
 
     const id =
-        document.getElementById("postId").value;
+    document.getElementById(
+        "postId"
+    ).value;
 
     const title =
-        document.getElementById("postTitle").value.trim();
+    document.getElementById(
+        "postTitle"
+    ).value.trim();
 
     const category =
-        document.getElementById("postCategory").value.trim()
-        || "Genel";
+    document.getElementById(
+        "postCategory"
+    ).value.trim()
+    || "Genel";
 
     const readTime =
-        parseInt(
-            document.getElementById("postReadTime").value
-        ) || 5;
+    parseInt(
+        document.getElementById(
+            "postReadTime"
+        ).value
+    ) || 5;
 
     const cover =
-        document.getElementById("postCover").value.trim();
+    document.getElementById(
+        "postCover"
+    ).value.trim();
 
     const tags =
-        document.getElementById("postTags").value
-            .split(",")
-            .map(x => x.trim())
-            .filter(Boolean);
+    document.getElementById(
+        "postTags"
+    ).value
+    .split(",")
+    .map(x=>x.trim())
+    .filter(Boolean);
 
     const content =
-        document.getElementById("postContent").value.trim();
+    document.getElementById(
+        "postContent"
+    ).value.trim();
 
     const published =
-        document.getElementById("postPublished").checked;
+    document.getElementById(
+        "postPublished"
+    ).checked;
 
-    if (!title || !content) {
+    if(!title || !content){
 
-        alert("Başlık ve yazı alanı boş bırakılamaz.");
+        showToast(
+            "Başlık ve yazı alanı boş bırakılamaz."
+        );
+
         return;
     }
 
     const slug =
-        createSlug(title);
+    createSlug(title);
 
     const postData = {
+
         title,
         slug,
-        excerpt: content.substring(0, 160),
+        excerpt:
+        content.substring(0,160),
+
         category,
+
         tags,
-        cover_url: cover,
+
+        cover_url:
+        cover,
+
         content,
-        read_time: readTime,
+
+        read_time:
+        readTime,
+
+        published,
+
+        published_at:
         published
+        ? new Date().toISOString()
+        : null
+
     };
 
     let result;
 
-    if (id) {
+    if(id){
 
         result =
-            await supabaseClient
-                .from("posts")
-                .update(postData)
-                .eq("id", id);
+        await supabaseClient
+            .from("posts")
+            .update(postData)
+            .eq("id",id);
 
-    } else {
+    }else{
 
         result =
-            await supabaseClient
-                .from("posts")
-                .insert(postData);
+        await supabaseClient
+            .from("posts")
+            .insert(postData);
+
     }
 
-    if (result.error) {
-
-        alert(
-            "Yazı kaydedilemedi:\n\n" +
-            result.error.message
-        );
+    if(result.error){
 
         console.error(result.error);
+
+        showToast(
+            "Yazı kaydedilemedi: " +
+            result.error.message
+        );
 
         return;
     }
 
-    closeModal("editorModal");
+    closeModal(
+        "editorModal"
+    );
 
     await loadPosts();
     await loadAdminPosts();
 
-    alert("Yazı başarıyla kaydedildi. ✅");
+    showToast(
+        id
+        ? "Yazı güncellendi. ✅"
+        : "Yazı yayınlandı. 🎉"
+    );
+
 }
 
 
-/* ================================
-   SİL
-================================ */
+/* =========================================================
+   DELETE
+========================================================= */
 
-async function deletePost(id) {
+async function deletePost(id){
 
-    if (!confirm(
-        "Bu yazıyı silmek istediğine emin misin?"
-    )) return;
+    if(!currentSession){
 
-    const { error } =
-        await supabaseClient
-            .from("posts")
-            .delete()
-            .eq("id", id);
+        showToast(
+            "Admin girişi gerekli."
+        );
 
-    if (error) {
+        return;
+    }
 
-        alert(
-            "Yazı silinemedi:\n\n" +
+    const confirmed =
+    confirm(
+        "Bu yazıyı kalıcı olarak silmek istediğine emin misin?"
+    );
+
+    if(!confirmed) return;
+
+    const {error} =
+    await supabaseClient
+        .from("posts")
+        .delete()
+        .eq("id",id);
+
+    if(error){
+
+        showToast(
+            "Yazı silinemedi: " +
             error.message
         );
 
@@ -1299,83 +2171,172 @@ async function deletePost(id) {
 
     await loadPosts();
     await loadAdminPosts();
+
+    showToast(
+        "Yazı silindi."
+    );
+
 }
 
 
-/* ================================
-   YARDIMCI FONKSİYONLAR
-================================ */
+/* =========================================================
+   HELPERS
+========================================================= */
 
-function closeModal(id) {
+function closeModal(id){
 
-    document.getElementById(id).style.display =
-        "none";
+    document.getElementById(
+        id
+    ).style.display = "none";
+
 }
 
 
-function formatDate(date) {
+function formatDate(date){
 
-    if (!date) return "";
+    if(!date) return "";
 
-    return new Date(date).toLocaleDateString(
+    return new Date(date)
+    .toLocaleDateString(
         "tr-TR",
         {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
+            day:"numeric",
+            month:"long",
+            year:"numeric"
         }
     );
+
 }
 
 
-function createSlug(text) {
+function createSlug(text){
 
     return text
-        .toLowerCase()
-        .replace(/ğ/g, "g")
-        .replace(/ü/g, "u")
-        .replace(/ş/g, "s")
-        .replace(/ı/g, "i")
-        .replace(/ö/g, "o")
-        .replace(/ç/g, "c")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        + "-" + Date.now();
+    .toLowerCase()
+    .replace(/ğ/g,"g")
+    .replace(/ü/g,"u")
+    .replace(/ş/g,"s")
+    .replace(/ı/g,"i")
+    .replace(/ö/g,"o")
+    .replace(/ç/g,"c")
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-+|-+$/g,"")
+    + "-" + Date.now();
+
 }
 
 
-function escapeHTML(text) {
+function escapeHTML(text){
 
-    if (!text) return "";
+    if(text === null ||
+       text === undefined){
+
+        return "";
+
+    }
 
     return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
 }
 
 
-function escapeAttribute(text) {
+function escapeAttribute(text){
 
     return escapeHTML(text);
+
 }
 
 
-/* MODAL DIŞINA TIKLAYINCA KAPAT */
+function showToast(message){
 
-document.querySelectorAll(".modal").forEach(modal => {
+    const toast =
+    document.getElementById(
+        "toast"
+    );
 
-    modal.addEventListener("click", function(e) {
+    toast.textContent = message;
 
-        if (e.target === modal) {
-            modal.style.display = "none";
+    toast.classList.add("show");
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+    window.toastTimer =
+    setTimeout(()=>{
+
+        toast.classList.remove(
+            "show"
+        );
+
+    },3000);
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+document
+.querySelectorAll(".modal")
+.forEach(modal=>{
+
+    modal.addEventListener(
+        "click",
+        function(e){
+
+            if(e.target === modal){
+
+                modal.style.display =
+                "none";
+
+            }
+
         }
-
-    });
+    );
 
 });
+
+
+/* =========================================================
+   ENTER KEY LOGIN
+========================================================= */
+
+document
+.getElementById("loginPassword")
+.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "Enter"){
+
+            login();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   BROWSER BACK
+========================================================= */
+
+window.addEventListener(
+    "popstate",
+    ()=>{
+
+        showHome();
+
+    }
+);
+
 </script>
 
 </body>
