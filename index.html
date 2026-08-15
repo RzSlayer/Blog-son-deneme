@@ -1,0 +1,1745 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kişisel Blog</title>
+  <meta name="description" content="Kişisel dijital dergi" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root{
+      --bg:#0b0b0d;
+      --card:#131316;
+      --ink:#f2f0ea;
+      --soft:#d8d5cc;
+      --muted:#8c8a85;
+      --line:#26252a;
+      --accent:#c89b3c
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:Inter,sans-serif
+    }
+
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+
+    .serif{font-family:Fraunces,serif}
+    .mono{font-family:"JetBrains Mono",monospace}
+
+    .container{
+      max-width:1120px;
+      margin:auto;
+      padding:0 20px
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line)
+    }
+
+    .muted{color:var(--muted)}
+    .accent{color:var(--accent)}
+
+    .btn{
+      border:1px solid var(--line);
+      padding:10px 14px;
+      border-radius:8px;
+      background:transparent;
+      color:var(--ink)
+    }
+
+    .btn-primary{
+      background:var(--accent);
+      color:#111;
+      border:0
+    }
+
+    .btn-danger{
+      background:#5a2020;
+      color:#fff;
+      border:0
+    }
+
+    .field{
+      width:100%;
+      background:#0f0f12;
+      border:1px solid var(--line);
+      color:var(--ink);
+      border-radius:8px;
+      padding:12px;
+      outline:none
+    }
+
+    .field:focus{border-color:var(--accent)}
+
+    .prose p{
+      line-height:1.85;
+      margin:0 0 20px;
+      color:var(--soft)
+    }
+
+    .prose h2{
+      font:500 28px Fraunces,serif;
+      margin:34px 0 14px
+    }
+
+    .prose ul{
+      line-height:1.8;
+      color:var(--soft);
+      margin-bottom:20px
+    }
+
+    .cover{
+      background:linear-gradient(135deg,#241019,#3a1220 45%,#0e0a12);
+      min-height:210px
+    }
+
+    .hidden{display:none!important}
+
+    @media(max-width:700px){
+      .hero{
+        grid-template-columns:1fr!important
+      }
+
+      .hero h1{
+        font-size:40px!important
+      }
+
+      .grid-3{
+        grid-template-columns:1fr!important
+      }
+
+      nav button{
+        display:none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script>
+
+/* ============================================================
+   KARANLIK DERGİ
+   GitHub Pages + Supabase
+   ============================================================ */
+
+/* BURAYA SUPABASE BİLGİLERİNİ YAZACAĞIZ */
+const SUPABASE_URL = "BURAYA_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "BURAYA_SUPABASE_ANON_KEY";
+
+const ready =
+  !SUPABASE_URL.includes("BURAYA_") &&
+  !SUPABASE_ANON_KEY.includes("BURAYA_");
+
+const sb = ready
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+
+/* KATEGORİLER */
+
+const CATEGORIES = [
+  ["oyunlar","🎮","Oyunlar"],
+  ["dizi-film","🎬","Dizi & Film"],
+  ["muzik","🎵","Müzik"],
+  ["kitaplar","📚","Kitaplar"],
+  ["teknoloji","💻","Teknoloji"],
+  ["blender","🎨","Blender / Tasarım"],
+  ["yazarlik","✍️","Yazarlık"],
+  ["internet","🌐","İnternet Kültürü"],
+  ["dusunceler","💭","Kişisel Düşünceler"],
+  ["random","🔥","Rastgele"]
+];
+
+const catName = s =>
+  (CATEGORIES.find(x => x[0] === s) || ["","✦","Genel"])[2];
+
+
+/* STATE */
+
+let state = {
+  page:"home",
+  posts:[],
+  post:null,
+  admin:false,
+  editing:null,
+  search:"",
+  category:null
+};
+
+
+/* YARDIMCI FONKSİYONLAR */
+
+function esc(v=""){
+  return String(v).replace(/[&<>"']/g,m=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+
+function fmt(d){
+  return new Date(d).toLocaleDateString("tr-TR",{
+    day:"numeric",
+    month:"long",
+    year:"numeric"
+  });
+}
+
+
+function slugify(s){
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-|-$/g,"");
+}
+
+
+/* BASİT MARKDOWN */
+
+function markdown(s){
+
+  let x = esc(s);
+
+  x = x
+    .replace(/^### (.*)$/gm,"<h2>$1</h2>")
+    .replace(/^## (.*)$/gm,"<h2>$1</h2>");
+
+  x = x.replace(/^\- (.*)$/gm,"<li>$1</li>");
+
+  x = x.replace(
+    /(<li>.*<\/li>)/gs,
+    "<ul>$1</ul>"
+  );
+
+  return x
+    .split(/\n{2,}/)
+    .map(b =>
+      b.trim().startsWith("<h2>") ||
+      b.trim().startsWith("<ul>")
+        ? b
+        : `<p>${b.replace(/\n/g,"<br>")}</p>`
+    )
+    .join("");
+}
+
+
+/* VERİLERİ YÜKLE */
+
+async function load(){
+
+  if(!sb){
+    render();
+    return;
+  }
+
+  const {data,error} =
+    await sb
+      .from("posts")
+      .select("*")
+      .eq("published",true)
+      .order("published_at",{ascending:false});
+
+  state.posts = error ? [] : (data || []);
+
+  const {data:u} =
+    await sb.auth.getUser();
+
+  state.admin = !!u?.user;
+
+  render();
+}
+
+
+/* NAVİGASYON */
+
+function navigate(page,extra={}){
+
+  state = {
+    ...state,
+    page,
+    ...extra
+  };
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+  render();
+}
+
+
+/* ÜST MENÜ */
+
+function nav(){
+
+  return `
+<header style="
+position:sticky;
+top:0;
+z-index:20;
+background:rgba(11,11,13,.92);
+backdrop-filter:blur(12px);
+border-bottom:1px solid var(--line)
+">
+
+<div class="container" style="
+height:68px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:18px
+">
+
+<button
+onclick="navigate('home')"
+style="
+background:none;
+border:0;
+color:var(--ink);
+display:flex;
+align-items:center;
+gap:9px
+">
+
+<span style="
+width:8px;
+height:8px;
+border-radius:50%;
+background:var(--accent)
+"></span>
+
+<span class="serif" style="font-size:21px">
+Karanlık Dergi
+</span>
+
+</button>
+
+
+<nav style="
+display:flex;
+gap:22px;
+align-items:center
+">
+
+<button class="muted"
+style="background:none;border:0"
+onclick="navigate('home')">
+Ana Sayfa
+</button>
+
+<button class="muted"
+style="background:none;border:0"
+onclick="navigate('posts')">
+Yazılar
+</button>
+
+<button class="muted"
+style="background:none;border:0"
+onclick="navigate('categories')">
+Kategoriler
+</button>
+
+<button class="muted"
+style="background:none;border:0"
+onclick="navigate('about')">
+Hakkımda
+</button>
+
+<button class="muted"
+style="background:none;border:0"
+onclick="navigate('admin')">
+
+${state.admin ? "Yönetim" : "Giriş"}
+
+</button>
+
+</nav>
+
+</div>
+</header>
+`;
+}
+
+
+/* YAZI KARTI */
+
+function card(p){
+
+  return `
+
+<button
+onclick="navigate('post',{
+post:state.posts.find(x=>x.id==='${p.id}')
+})"
+
+class="card"
+style="
+text-align:left;
+padding:0;
+overflow:hidden;
+border-radius:8px;
+width:100%;
+background:var(--card);
+color:var(--ink)
+">
+
+<div
+class="cover"
+style="
+${p.cover_url
+?`background-image:url('${esc(p.cover_url)}');
+background-size:cover;
+background-position:center`
+:""}
+">
+
+<span
+class="mono"
+style="
+display:inline-block;
+margin:12px;
+padding:6px 8px;
+background:#000a;
+color:#fff;
+font-size:10px
+">
+SAYI
+</span>
+
+</div>
+
+
+<div style="padding:18px">
+
+<div
+class="accent"
+style="
+font-size:11px;
+text-transform:uppercase;
+letter-spacing:.08em;
+font-weight:700
+">
+${esc(catName(p.category))}
+</div>
+
+
+<h3
+class="serif"
+style="
+font-size:24px;
+line-height:1.15;
+margin:8px 0
+">
+${esc(p.title)}
+</h3>
+
+
+<p
+class="muted"
+style="
+line-height:1.6;
+font-size:14px
+">
+${esc(p.excerpt || "")}
+</p>
+
+
+<div
+class="mono muted"
+style="
+font-size:10px;
+margin-top:12px
+">
+
+${fmt(p.published_at || p.created_at)}
+·
+${p.read_time || 1} dk
+
+</div>
+
+</div>
+
+</button>
+`;
+}
+
+
+/* ANA SAYFA */
+
+function home(){
+
+  const hero = state.posts[0];
+
+  return `
+
+<main>
+
+${
+hero
+
+?
+
+`
+<section
+class="container hero"
+style="
+padding-top:55px;
+padding-bottom:70px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:45px;
+align-items:center
+">
+
+<div>
+
+<div
+class="mono accent"
+style="
+font-size:11px;
+letter-spacing:.15em;
+margin-bottom:16px
+">
+SON YAYIN
+</div>
+
+
+<h1
+class="serif"
+style="
+font-size:54px;
+line-height:1.05;
+margin:0 0 18px
+">
+${esc(hero.title)}
+</h1>
+
+
+<p
+class="muted"
+style="
+font-size:17px;
+line-height:1.7
+">
+${esc(hero.excerpt || "")}
+</p>
+
+
+<button
+class="btn btn-primary"
+style="margin-top:18px"
+onclick="navigate('post',{
+post:state.posts[0]
+})">
+Yazıyı oku →
+</button>
+
+</div>
+
+
+<div
+class="cover"
+style="
+border-radius:8px;
+${hero.cover_url
+?`background-image:url('${esc(hero.cover_url)}');
+background-size:cover;
+background-position:center`
+:""}
+">
+</div>
+
+</section>
+`
+
+:
+
+`
+
+<section
+class="container"
+style="
+padding:100px 20px;
+text-align:center
+">
+
+<div class="accent mono">
+KARANLIK DERGİ
+</div>
+
+<h1
+class="serif"
+style="
+font-size:60px;
+margin:15px 0
+">
+Kendi köşene hoş geldin.
+</h1>
+
+<p class="muted">
+Henüz yayınlanmış bir yazı yok.
+</p>
+
+</section>
+`
+}
+
+
+<section
+class="container"
+style="padding-bottom:90px"
+>
+
+<div
+style="
+border-bottom:1px solid var(--line);
+padding-bottom:12px
+">
+
+<span
+class="mono accent"
+style="font-size:11px">
+ARŞİV
+</span>
+
+<h2
+class="serif"
+style="
+font-size:34px;
+margin:4px 0
+">
+Son Yazılar
+</h2>
+
+</div>
+
+
+<div
+class="grid-3"
+style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+margin-top:28px
+">
+
+${state.posts.slice(0,6).map(card).join("")}
+
+</div>
+
+</section>
+
+</main>
+`;
+}
+
+
+/* YAZILAR */
+
+function postsPage(){
+
+  let list = state.posts;
+
+  if(state.search){
+
+    list = list.filter(p =>
+      (
+        p.title +
+        " " +
+        p.excerpt +
+        " " +
+        p.tags
+      )
+      .toLowerCase()
+      .includes(
+        state.search.toLowerCase()
+      )
+    );
+
+  }
+
+  return `
+
+<main
+class="container"
+style="
+padding-top:50px;
+padding-bottom:90px
+">
+
+<div
+style="
+display:flex;
+justify-content:space-between;
+gap:15px;
+align-items:end
+">
+
+<div>
+
+<div
+class="mono accent"
+style="font-size:11px">
+ARŞİVİN TAMAMI
+</div>
+
+<h1
+class="serif"
+style="
+font-size:45px;
+margin:5px 0
+">
+Yazılar
+</h1>
+
+</div>
+
+
+<input
+class="field"
+style="max-width:260px"
+placeholder="Yazılarda ara..."
+value="${esc(state.search)}"
+oninput="
+state.search=this.value;
+render()
+">
+
+</div>
+
+
+<div
+class="grid-3"
+style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+margin-top:35px
+">
+
+${
+list.map(card).join("")
+||
+"<p class='muted'>Yazı bulunamadı.</p>"
+}
+
+</div>
+
+</main>
+`;
+}
+
+
+/* KATEGORİLER */
+
+function categories(){
+
+  return `
+
+<main
+class="container"
+style="
+padding-top:50px;
+padding-bottom:90px
+">
+
+<div class="mono accent">
+KEŞFET
+</div>
+
+<h1
+class="serif"
+style="font-size:45px">
+Kategoriler
+</h1>
+
+
+<div
+class="grid-3"
+style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-top:30px
+">
+
+${CATEGORIES.map(c => `
+
+<button
+class="card"
+style="
+padding:25px;
+text-align:left;
+color:var(--ink)
+"
+onclick="
+navigate('category',{
+category:'${c[0]}'
+})
+">
+
+<div style="font-size:28px">
+${c[1]}
+</div>
+
+<div
+class="serif"
+style="
+font-size:22px;
+margin-top:10px
+">
+${c[2]}
+</div>
+
+<div
+class="mono muted"
+style="
+font-size:10px;
+margin-top:7px
+">
+
+${state.posts.filter(
+p => p.category === c[0]
+).length}
+
+yazı
+
+</div>
+
+</button>
+
+`).join("")}
+
+</div>
+
+</main>
+`;
+}
+
+
+/* KATEGORİ SAYFASI */
+
+function category(){
+
+  const arr =
+    state.posts.filter(
+      p => p.category === state.category
+    );
+
+  return `
+
+<main
+class="container"
+style="
+padding-top:50px;
+padding-bottom:90px
+">
+
+<div class="mono accent">
+KATEGORİ
+</div>
+
+<h1
+class="serif"
+style="font-size:45px">
+${catName(state.category)}
+</h1>
+
+
+<div
+class="grid-3"
+style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+margin-top:30px
+">
+
+${
+arr.map(card).join("")
+||
+"<p class='muted'>Bu kategoride henüz yazı yok.</p>"
+}
+
+</div>
+
+</main>
+`;
+}
+
+
+/* TEK YAZI */
+
+function article(){
+
+  const p = state.post;
+
+  if(!p) return "";
+
+  return `
+
+<main
+class="container"
+style="
+max-width:800px;
+padding-top:55px;
+padding-bottom:90px
+">
+
+<div
+class="mono accent"
+style="font-size:11px">
+${esc(catName(p.category))}
+</div>
+
+
+<h1
+class="serif"
+style="
+font-size:52px;
+line-height:1.08;
+margin:12px 0
+">
+${esc(p.title)}
+</h1>
+
+
+<p
+class="muted"
+style="
+font-size:18px;
+line-height:1.7
+">
+${esc(p.excerpt || "")}
+</p>
+
+
+<div
+class="mono muted"
+style="
+font-size:11px;
+padding:16px 0;
+border-bottom:1px solid var(--line)
+">
+
+${fmt(p.published_at || p.created_at)}
+·
+${p.read_time || 1}
+dk okuma
+
+</div>
+
+
+<div
+class="cover"
+style="
+margin:28px 0;
+border-radius:8px;
+${p.cover_url
+?`background-image:url('${esc(p.cover_url)}');
+background-size:cover;
+background-position:center`
+:""}
+">
+</div>
+
+
+<article class="prose">
+${markdown(p.content || "")}
+</article>
+
+
+<div
+style="
+border-top:1px solid var(--line);
+margin-top:40px;
+padding-top:25px
+">
+
+<button
+class="btn"
+onclick="navigate('posts')">
+← Tüm yazılar
+</button>
+
+</div>
+
+</main>
+`;
+}
+
+
+/* HAKKIMDA */
+
+function about(){
+
+  return `
+
+<main
+class="container"
+style="
+max-width:800px;
+padding-top:60px;
+padding-bottom:100px
+">
+
+<div class="mono accent">
+HAKKIMDA
+</div>
+
+<h1
+class="serif"
+style="font-size:55px">
+Ben kimim?
+</h1>
+
+
+<div class="prose">
+
+<p>
+Burayı kendi internet köşem olarak kurdum.
+Oyunlardan dizilere, teknolojiden yazarlığa kadar
+o an ilgimi çeken şeyleri burada yazıyorum.
+</p>
+
+<p>
+Burası algoritmanın akışında kaybolan kısa paylaşımlar
+yerine, biraz daha uzun düşüncelerin yaşayacağı bir yer.
+</p>
+
+</div>
+
+</main>
+`;
+}
+
+
+/* GİRİŞ */
+
+function login(){
+
+  return `
+
+<main
+class="container"
+style="
+max-width:450px;
+padding-top:100px;
+padding-bottom:120px
+">
+
+<div
+class="card"
+style="padding:30px"
+>
+
+<div
+class="mono accent"
+style="font-size:11px">
+YÖNETİM PANELİ
+</div>
+
+<h1
+class="serif"
+style="font-size:35px">
+Giriş yap
+</h1>
+
+
+<input
+id="email"
+class="field"
+placeholder="E-posta"
+type="email"
+style="margin:8px 0"
+>
+
+
+<input
+id="password"
+class="field"
+placeholder="Şifre"
+type="password"
+style="margin:8px 0"
+>
+
+
+<button
+class="btn btn-primary"
+style="
+width:100%;
+margin-top:10px
+"
+onclick="loginAdmin()">
+Giriş yap
+</button>
+
+
+<p
+id="loginMsg"
+class="muted"
+style="font-size:13px">
+</p>
+
+</div>
+
+</main>
+`;
+}
+
+
+/* YÖNETİM PANELİ */
+
+function admin(){
+
+  if(!state.admin)
+    return login();
+
+  const all = state.posts;
+
+  return `
+
+<main
+class="container"
+style="
+padding-top:45px;
+padding-bottom:100px
+">
+
+<div
+style="
+display:flex;
+justify-content:space-between;
+align-items:center
+">
+
+<div>
+
+<div class="mono accent">
+YÖNETİM PANELİ
+</div>
+
+<h1
+class="serif"
+style="
+font-size:45px;
+margin:4px 0
+">
+Yazıların
+</h1>
+
+</div>
+
+
+<div>
+
+<button
+class="btn btn-primary"
+onclick="editPost(null)">
+＋ Yeni yazı
+</button>
+
+<button
+class="btn"
+onclick="logoutAdmin()">
+Çıkış
+</button>
+
+</div>
+
+</div>
+
+
+<div
+style="
+margin-top:30px;
+display:grid;
+gap:10px
+">
+
+${
+all.map(p => `
+
+<div
+class="card"
+style="
+padding:16px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px
+">
+
+<div>
+
+<div
+class="serif"
+style="font-size:20px">
+${esc(p.title)}
+</div>
+
+<div
+class="mono muted"
+style="font-size:10px">
+
+${p.published ? "YAYINDA" : "TASLAK"}
+·
+${esc(catName(p.category))}
+
+</div>
+
+</div>
+
+
+<div>
+
+<button
+class="btn"
+onclick="editPost('${p.id}')">
+Düzenle
+</button>
+
+<button
+class="btn btn-danger"
+onclick="deletePost('${p.id}')">
+Sil
+</button>
+
+</div>
+
+</div>
+
+`).join("")
+
+||
+
+"<p class='muted'>
+Henüz yazı yok. İlk yazını oluştur.
+</p>"
+
+}
+
+</div>
+
+</main>
+`;
+}
+
+
+/* YAZI EDİTÖRÜ */
+
+function editor(){
+
+  const p =
+    state.editing ||
+    {
+      title:"",
+      excerpt:"",
+      category:"oyunlar",
+      tags:"",
+      cover_url:"",
+      content:"",
+      read_time:5,
+      published:false
+    };
+
+
+  return `
+
+<main
+class="container"
+style="
+max-width:850px;
+padding-top:40px;
+padding-bottom:100px
+">
+
+<button
+class="btn"
+onclick="navigate('admin')">
+← Yönetim paneli
+</button>
+
+
+<h1
+class="serif"
+style="font-size:45px">
+
+${state.editing
+  ? "Yazıyı düzenle"
+  : "Yeni yazı"}
+
+</h1>
+
+
+<div
+class="card"
+style="
+padding:25px;
+display:grid;
+gap:12px
+">
+
+
+<label>
+Başlık
+
+<input
+id="fTitle"
+class="field"
+value="${esc(p.title)}"
+placeholder="Yazının başlığı"
+>
+
+</label>
+
+
+<label>
+Kısa açıklama
+
+<input
+id="fExcerpt"
+class="field"
+value="${esc(p.excerpt || "")}"
+placeholder="Ana sayfada görünecek kısa açıklama"
+>
+
+</label>
+
+
+<label>
+Kategori
+
+<select
+id="fCategory"
+class="field">
+
+${CATEGORIES.map(c => `
+
+<option
+value="${c[0]}"
+${p.category === c[0] ? "selected" : ""}
+>
+
+${c[1]} ${c[2]}
+
+</option>
+
+`).join("")}
+
+</select>
+
+</label>
+
+
+<label>
+Etiketler
+
+<input
+id="fTags"
+class="field"
+value="${
+  esc(
+    Array.isArray(p.tags)
+      ? p.tags.join(", ")
+      : p.tags || ""
+  )
+}"
+placeholder="GTA, Oyun, Rockstar"
+>
+
+</label>
+
+
+<label>
+Kapak görseli URL'si
+
+<input
+id="fCover"
+class="field"
+value="${esc(p.cover_url || "")}"
+placeholder="https://..."
+>
+
+</label>
+
+
+<label>
+Okuma süresi
+
+<input
+id="fRead"
+class="field"
+type="number"
+min="1"
+value="${p.read_time || 5}"
+>
+
+</label>
+
+
+<label>
+Yazı
+
+<textarea
+id="fContent"
+class="field"
+rows="18"
+placeholder="Yazını buraya yaz..."
+>${esc(p.content || "")}</textarea>
+
+</label>
+
+
+<label
+style="
+display:flex;
+gap:8px;
+align-items:center
+">
+
+<input
+id="fPublished"
+type="checkbox"
+${p.published ? "checked" : ""}
+>
+
+Hemen yayınla
+
+</label>
+
+
+<button
+class="btn btn-primary"
+onclick="savePost()">
+Yazıyı kaydet
+</button>
+
+
+<p
+id="saveMsg"
+class="muted">
+</p>
+
+</div>
+
+</main>
+`;
+}
+
+
+/* GİRİŞ YAP */
+
+async function loginAdmin(){
+
+  if(!sb) return;
+
+  const email =
+    document.getElementById("email").value;
+
+  const password =
+    document.getElementById("password").value;
+
+
+  const {error} =
+    await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+
+  document.getElementById("loginMsg")
+    .textContent =
+      error
+        ? error.message
+        : "Giriş başarılı.";
+
+
+  if(!error){
+
+    const {data:u} =
+      await sb.auth.getUser();
+
+    state.admin = !!u?.user;
+
+    navigate("admin");
+  }
+}
+
+
+/* ÇIKIŞ */
+
+async function logoutAdmin(){
+
+  await sb.auth.signOut();
+
+  state.admin = false;
+
+  navigate("home");
+}
+
+
+/* YAZI DÜZENLE */
+
+function editPost(id){
+
+  state.editing =
+    id
+      ? state.posts.find(p => p.id === id)
+      : null;
+
+  navigate("editor");
+}
+
+
+/* YAZI KAYDET */
+
+async function savePost(){
+
+  const g = id =>
+    document.getElementById(id).value;
+
+
+  const published =
+    document.getElementById(
+      "fPublished"
+    ).checked;
+
+
+  const payload = {
+
+    title:g("fTitle"),
+
+    slug:slugify(
+      g("fTitle")
+    ),
+
+    excerpt:g("fExcerpt"),
+
+    category:g("fCategory"),
+
+    tags:
+      g("fTags")
+        .split(",")
+        .map(x => x.trim())
+        .filter(Boolean),
+
+    cover_url:g("fCover"),
+
+    content:g("fContent"),
+
+    read_time:
+      Number(g("fRead")) || 5,
+
+    published,
+
+    published_at:
+      published
+        ? new Date().toISOString()
+        : null
+  };
+
+
+  const msg =
+    document.getElementById(
+      "saveMsg"
+    );
+
+
+  if(
+    !payload.title ||
+    !payload.content
+  ){
+
+    msg.textContent =
+      "Başlık ve yazı kısmını doldur.";
+
+    return;
+  }
+
+
+  let result;
+
+
+  if(state.editing){
+
+    result =
+      await sb
+        .from("posts")
+        .update(payload)
+        .eq(
+          "id",
+          state.editing
+        );
+
+  }else{
+
+    result =
+      await sb
+        .from("posts")
+        .insert(payload);
+
+  }
+
+
+  if(result.error){
+
+    msg.textContent =
+      "Hata: " +
+      result.error.message;
+
+    return;
+  }
+
+
+  await load();
+
+  navigate("admin");
+}
+
+
+/* YAZI SİL */
+
+async function deletePost(id){
+
+  if(
+    !confirm(
+      "Bu yazı silinsin mi?"
+    )
+  ) return;
+
+
+  await sb
+    .from("posts")
+    .delete()
+    .eq("id",id);
+
+
+  await load();
+
+  navigate("admin");
+}
+
+
+/* SAYFAYI ÇİZ */
+
+function render(){
+
+  let body = "";
+
+
+  if(state.page === "home")
+    body = home();
+
+  if(state.page === "posts")
+    body = postsPage();
+
+  if(state.page === "categories")
+    body = categories();
+
+  if(state.page === "category")
+    body = category();
+
+  if(state.page === "post")
+    body = article();
+
+  if(state.page === "about")
+    body = about();
+
+  if(state.page === "admin")
+    body = admin();
+
+  if(state.page === "editor")
+    body = editor();
+
+
+  document.getElementById(
+    "app"
+  ).innerHTML =
+
+    nav() +
+
+    body +
+
+    `
+
+<footer
+style="
+border-top:1px solid var(--line);
+padding:35px 20px;
+text-align:center
+">
+
+<span class="serif">
+Karanlık Dergi
+</span>
+
+<div
+class="mono muted"
+style="
+font-size:10px;
+margin-top:7px
+">
+
+Kendi köşende yazmaya devam et.
+
+</div>
+
+</footer>
+
+`;
+
+
+  if(window.lucide)
+    lucide.createIcons();
+}
+
+
+/* AUTH */
+
+if(sb){
+
+  sb.auth.onAuthStateChange(
+    (_e,s) => {
+
+      state.admin =
+        !!s?.user;
+
+      render();
+
+    }
+  );
+
+}
+
+
+/* BAŞLAT */
+
+load();
+
+</script>
+
+</body>
+</html>
